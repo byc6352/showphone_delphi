@@ -1,0 +1,522 @@
+object fMain: TfMain
+  Left = 106
+  Top = 9
+  Caption = #29454#35961#36828#31243#21327#21161#25163#26426'v3.00('#30005#33041#29256')'
+  ClientHeight = 633
+  ClientWidth = 1037
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = False
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 1037
+    Height = 27
+    Align = alTop
+    TabOrder = 0
+    object btnClose: TSpeedButton
+      Left = 720
+      Top = 2
+      Width = 81
+      Height = 23
+      Caption = #20851#38381
+      OnClick = btnCloseClick
+    end
+    object btnCameraCap: TSpeedButton
+      Left = 114
+      Top = 2
+      Width = 70
+      Height = 22
+      Caption = #25668#20687#22836#30417#25511
+      OnClick = btnCameraCapClick
+    end
+    object btnLocation: TSpeedButton
+      Left = 187
+      Top = 2
+      Width = 37
+      Height = 22
+      Caption = #23450#20301
+      OnClick = btnLocationClick
+    end
+    object btnConnect: TSpeedButton
+      Left = 6
+      Top = 2
+      Width = 32
+      Height = 22
+      Caption = #36830#25509
+      OnClick = btnConnectClick
+    end
+    object btnSetPhone: TSpeedButton
+      Left = 640
+      Top = 2
+      Width = 81
+      Height = 23
+      Caption = #37197#32622
+      OnClick = btnSetPhoneClick
+    end
+    object btnShotSeriesScreen: TButton
+      Left = 41
+      Top = 2
+      Width = 70
+      Height = 22
+      Caption = #23631#24149#30417#25511
+      TabOrder = 0
+      OnClick = btnShotSeriesScreenClick
+    end
+  end
+  object Bar1: TStatusBar
+    Left = 0
+    Top = 614
+    Width = 1037
+    Height = 19
+    Panels = <
+      item
+        Width = 600
+      end
+      item
+        Width = 150
+      end
+      item
+        Width = 100
+      end
+      item
+        Width = 50
+      end>
+  end
+  object treePhone: TTreeView
+    Left = 0
+    Top = 27
+    Width = 137
+    Height = 587
+    Align = alLeft
+    AutoExpand = True
+    Font.Charset = GB2312_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -14
+    Font.Name = #20223#23435'_GB2312'
+    Font.Style = []
+    HideSelection = False
+    Indent = 19
+    ParentFont = False
+    ShowLines = False
+    ShowRoot = False
+    TabOrder = 2
+    OnClick = treePhoneClick
+  end
+  object Page1: TPageControl
+    Left = 137
+    Top = 27
+    Width = 900
+    Height = 587
+    ActivePage = tbFiles
+    Align = alClient
+    TabOrder = 3
+    object tbPhoneInfo: TTabSheet
+      Caption = #25163#26426#20449#24687
+      ImageIndex = 5
+      object memoPhoneInf: TMemo
+        Left = 0
+        Top = 0
+        Width = 892
+        Height = 559
+        Align = alClient
+        BorderStyle = bsNone
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -14
+        Font.Name = #23435#20307
+        Font.Style = []
+        ImeName = #26234#33021#38472#26725#36755#20837#24179#21488'  5.5'
+        ParentFont = False
+        ScrollBars = ssBoth
+        TabOrder = 0
+      end
+    end
+    object tbFiles: TTabSheet
+      Caption = #25991#20214#31649#29702
+      ImageIndex = 6
+      object Splitter2: TSplitter
+        Left = 195
+        Top = 0
+        Width = 5
+        Height = 559
+        ExplicitHeight = 566
+      end
+      object ListFiles: TListView
+        Left = 200
+        Top = 0
+        Width = 692
+        Height = 559
+        Align = alClient
+        Columns = <
+          item
+            Caption = #25991#20214#21517
+            Width = 180
+          end
+          item
+            Caption = #22823#23567
+            Width = 80
+          end
+          item
+            Caption = #21019#24314#26102#38388
+            Width = 150
+          end
+          item
+            Caption = #20462#25913#26102#38388
+          end>
+        PopupMenu = PopFile
+        SortType = stBoth
+        TabOrder = 0
+        ViewStyle = vsReport
+      end
+      object TreeDir: TTreeView
+        Left = 0
+        Top = 0
+        Width = 195
+        Height = 559
+        Align = alLeft
+        AutoExpand = True
+        HideSelection = False
+        Indent = 19
+        PopupMenu = PopDir
+        SortType = stText
+        TabOrder = 1
+        OnChange = TreeDirChange
+        Items.NodeData = {
+          0303000000200000000000000000000000FFFFFFFFFFFFFFFF00000000000000
+          000000000001012F00240000000000000000000000FFFFFFFFFFFFFFFF000000
+          0000000000000000000103530044006153220000000000000000000000FFFFFF
+          FFFFFFFFFF0000000000000000000000000102F8768C51}
+      end
+    end
+    object tbProcess: TTabSheet
+      Caption = 'APP'#31649#29702
+      ImageIndex = 7
+      object GroupBox2: TGroupBox
+        Left = 0
+        Top = 0
+        Width = 513
+        Height = 529
+        Align = alLeft
+        Caption = #31532#19977#26041#24212#29992
+        TabOrder = 0
+        object listThirdApp: TListView
+          Left = 2
+          Top = 15
+          Width = 509
+          Height = 512
+          Align = alClient
+          Columns = <
+            item
+              Caption = #24212#29992#31243#24207#21517#31216
+              Width = 100
+            end
+            item
+              Alignment = taCenter
+              Caption = #21253#21517
+              Width = 300
+            end
+            item
+              Alignment = taCenter
+              Caption = #26631#24535
+            end>
+          RowSelect = True
+          PopupMenu = popApp
+          TabOrder = 0
+          ViewStyle = vsReport
+        end
+      end
+      object GroupBox1: TGroupBox
+        Left = 513
+        Top = 0
+        Width = 379
+        Height = 529
+        Align = alClient
+        Caption = #31995#32479#24212#29992
+        TabOrder = 1
+        object listSysApp: TListView
+          Left = 2
+          Top = 15
+          Width = 375
+          Height = 512
+          Align = alClient
+          Columns = <
+            item
+              Caption = #24212#29992#31243#24207#21517#31216
+              Width = 100
+            end
+            item
+              Alignment = taCenter
+              Caption = #21253#21517
+              Width = 300
+            end
+            item
+              Alignment = taCenter
+              Caption = #26631#24535
+            end>
+          RowSelect = True
+          TabOrder = 0
+          ViewStyle = vsReport
+        end
+      end
+      object Panel5: TPanel
+        Left = 0
+        Top = 529
+        Width = 892
+        Height = 30
+        Align = alBottom
+        TabOrder = 2
+        object btnGetAppInfo: TButton
+          Left = 2
+          Top = 2
+          Width = 135
+          Height = 25
+          Caption = #33719#21462#24050#23433#35013#30340#24212#29992
+          TabOrder = 0
+          OnClick = btnGetAppInfoClick
+        end
+      end
+    end
+    object tbScreen: TTabSheet
+      Caption = #23631#24149
+      ImageIndex = 4
+      TabVisible = False
+      object ScrollBox1: TScrollBox
+        Left = 0
+        Top = 0
+        Width = 892
+        Height = 559
+        Align = alClient
+        TabOrder = 0
+        object imgScreen: TImage
+          Left = 6
+          Top = 8
+          Width = 575
+          Height = 385
+          AutoSize = True
+          Center = True
+          IncrementalDisplay = True
+        end
+      end
+    end
+    object tbSmallScreen: TTabSheet
+      Caption = #23567#23631
+      ImageIndex = 9
+      TabVisible = False
+      object imgScreen2: TImage
+        Left = 0
+        Top = 0
+        Width = 580
+        Height = 387
+        Center = True
+        IncrementalDisplay = True
+        Stretch = True
+      end
+    end
+    object tbSMS: TTabSheet
+      Caption = #36890#20449#24405
+      ImageIndex = 4
+      object memoSms: TMemo
+        Left = 0
+        Top = 0
+        Width = 892
+        Height = 531
+        Align = alClient
+        ImeName = #26234#33021#38472#26725#36755#20837#24179#21488'  5.5'
+        ScrollBars = ssBoth
+        TabOrder = 0
+      end
+      object Panel2: TPanel
+        Left = 0
+        Top = 531
+        Width = 892
+        Height = 28
+        Align = alBottom
+        TabOrder = 1
+        object btnSendSms: TSpeedButton
+          Left = 466
+          Top = 2
+          Width = 52
+          Height = 23
+          Caption = #21457#36865
+          OnClick = btnSendSmsClick
+        end
+        object btnSendSmss: TSpeedButton
+          Left = 520
+          Top = 2
+          Width = 52
+          Height = 23
+          Caption = #32676#21457
+          OnClick = btnSendSmssClick
+        end
+        object btnSMS: TSpeedButton
+          Left = 4
+          Top = 2
+          Width = 64
+          Height = 22
+          Caption = #33719#21462#30701#20449
+          OnClick = btnSMSClick
+        end
+        object btnCaLL: TSpeedButton
+          Left = 68
+          Top = 2
+          Width = 64
+          Height = 22
+          Caption = #36890#35805#35760#24405
+          OnClick = btnCaLLClick
+        end
+        object btnContact: TSpeedButton
+          Left = 132
+          Top = 2
+          Width = 64
+          Height = 22
+          Caption = #36890#35759#24405
+          OnClick = btnContactClick
+        end
+        object Label5: TLabel
+          Left = 202
+          Top = 8
+          Width = 143
+          Height = 13
+          AutoSize = False
+          Caption = #21521#27492#25163#26426#21495#21457#36865#30701#20449#65306
+        end
+        object edtTargetPhone: TEdit
+          Left = 335
+          Top = 4
+          Width = 128
+          Height = 21
+          ImeName = #26234#33021#38472#26725#36755#20837#24179#21488'  5.5'
+          TabOrder = 0
+          Text = '13229923588'
+        end
+      end
+    end
+    object tbLocation: TTabSheet
+      Caption = #23450#20301
+      ImageIndex = 5
+      object WebBrowser1: TWebBrowser
+        Left = 0
+        Top = 0
+        Width = 892
+        Height = 559
+        Align = alClient
+        TabOrder = 0
+        ExplicitWidth = 598
+        ExplicitHeight = 404
+        ControlData = {
+          4C000000315C0000C63900000000000000000000000000000000000000000000
+          000000004C000000000000000000000001000000E0D057007335CF11AE690800
+          2B2E126208000000000000004C0000000114020000000000C000000000000046
+          8000000000000000000000000000000000000000000000000000000000000000
+          00000000000000000100000000000000000000000000000000000000}
+      end
+    end
+    object tbsControlSet: TTabSheet
+      Caption = #36816#34892#20449#24687
+      ImageIndex = 6
+      object Splitter5: TSplitter
+        Left = 0
+        Top = 0
+        Width = 5
+        Height = 559
+        ExplicitHeight = 404
+      end
+      object memoOut: TMemo
+        Left = 5
+        Top = 0
+        Width = 887
+        Height = 559
+        Align = alClient
+        ImeName = #26234#33021#38472#26725#36755#20837#24179#21488'  5.5'
+        ScrollBars = ssBoth
+        TabOrder = 0
+      end
+    end
+  end
+  object PopDir: TPopupMenu
+    Left = 88
+    Top = 256
+    object PopCrtDir: TMenuItem
+      Caption = #21019#24314#30446#24405
+    end
+    object PopDelDir: TMenuItem
+      Caption = #21024#38500#30446#24405
+      OnClick = PopDelDirClick
+    end
+    object PopUpLoadDir: TMenuItem
+      Caption = #19978#20256#30446#24405
+    end
+    object PopDownDir: TMenuItem
+      Caption = #19979#36733#30446#24405
+      OnClick = PopDownDirClick
+    end
+    object PopSearchFile: TMenuItem
+      Caption = #25628#32034#25991#20214'...'
+    end
+  end
+  object PopFile: TPopupMenu
+    Left = 8
+    Top = 256
+    object popUpFile: TMenuItem
+      Caption = #19978#20256#25991#20214
+      OnClick = popUpFileClick
+    end
+    object PopDownFile: TMenuItem
+      Caption = #19979#36733#25991#20214
+      OnClick = PopDownFileClick
+    end
+    object PopDelFile: TMenuItem
+      Caption = #21024#38500#25991#20214
+      OnClick = PopDelFileClick
+    end
+    object PopInstall: TMenuItem
+      Caption = #23433#35013#24212#29992
+      OnClick = PopInstallClick
+    end
+    object popInsertImg: TMenuItem
+      Caption = #25554#20837#30456#20876
+      OnClick = popInsertImgClick
+    end
+  end
+  object Open1: TOpenDialog
+    Filter = #25152#26377#25991#20214'(*.*)|*.*'
+    Title = #35831#36873#25321#25991#20214
+    Left = 88
+    Top = 312
+  end
+  object Save1: TSaveDialog
+    Filter = #25152#26377#25991#20214'(*.*)|*.*'
+    InitialDir = 'c:\'
+    Title = #35831#36755#20837#35201#20445#23384#30340#25991#20214#21517
+    Left = 48
+    Top = 256
+  end
+  object Find1: TFindDialog
+    Left = 128
+    Top = 312
+  end
+  object popApp: TPopupMenu
+    Left = 304
+    Top = 256
+    object popRunApp: TMenuItem
+      Caption = #36816#34892#24212#29992
+    end
+    object popKillProcess: TMenuItem
+      Caption = #32456#27490#36827#31243
+    end
+    object popUnInstallApp: TMenuItem
+      Caption = #21368#36733#24212#29992
+    end
+  end
+end

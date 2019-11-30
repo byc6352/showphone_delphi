@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2019/11/02 14:13:22.000.594,=D:\works\delphi\Unit1.pas</Transaction>
+    <Transaction>2019/11/02 14:14:40.000.423,D:\works\delphi\phone\myphone\uMain.pas=D:\works\delphi\Unit1.pas</Transaction>
+    <Transaction>2019/11/02 14:14:40.000.423,D:\works\delphi\phone\myphone\uMain.dfm=D:\works\delphi\Unit1.dfm</Transaction>
+    <Transaction>2019/11/02 14:14:52.000.802,D:\works\delphi\phone\myphone\myphone.dproj=D:\works\delphi\Project1.dproj</Transaction>
+    <Transaction>2019/11/02 14:43:54.000.923,=D:\works\delphi\phone\myphone\Unit1.pas</Transaction>
+    <Transaction>2019/11/02 14:44:08.000.664,D:\works\delphi\phone\myphone\uDM.dfm=D:\works\delphi\phone\myphone\Unit1.dfm</Transaction>
+    <Transaction>2019/11/02 14:44:08.000.664,D:\works\delphi\phone\myphone\uDM.pas=D:\works\delphi\phone\myphone\Unit1.pas</Transaction>
+    <Transaction>2019/11/06 21:49:13.000.167,=D:\works\delphi\phone\myphone\uLog.pas</Transaction>
+    <Transaction>2019/11/06 21:49:13.000.159,=D:\works\delphi\phone\myphone\uFuncs.pas</Transaction>
+    <Transaction>2019/11/06 21:49:13.000.140,=D:\works\delphi\phone\myphone\uAuth.pas</Transaction>
+    <Transaction>2019/11/06 21:49:13.000.175,=D:\works\delphi\phone\myphone\untQQWry.pas</Transaction>
+    <Transaction>2019/11/06 21:49:13.000.150,=D:\works\delphi\phone\myphone\uConfig.pas</Transaction>
+    <Transaction>2019/11/06 21:49:13.000.183,=D:\works\delphi\phone\myphone\uReg.pas</Transaction>
+    <Transaction>2019/11/06 21:49:33.000.381,=D:\works\delphi\phone\myphone\uScreen.pas</Transaction>
+    <Transaction>2019/11/06 21:49:33.000.410,=D:\works\delphi\phone\myphone\uSmallScreen.pas</Transaction>
+    <Transaction>2019/11/06 21:56:45.000.080,=D:\works\delphi\phone\myphone\uCameraCap.pas</Transaction>
+    <Transaction>2019/11/06 21:57:48.000.033,=D:\works\delphi\phone\myphone\uSound.pas</Transaction>
+    <Transaction>2019/11/08 09:25:31.000.022,=D:\works\delphi\phone\myphone\uRecvData.pas</Transaction>
+    <Transaction>2019/11/08 09:34:58.000.341,=D:\works\delphi\phone\myphone\uSocket.pas</Transaction>
+    <Transaction>2019/11/08 09:34:58.000.349,=D:\works\delphi\phone\myphone\uZip.pas</Transaction>
+    <Transaction>2019/11/08 09:40:06.000.160,=D:\works\delphi\phone\myphone\Unit1.pas</Transaction>
+    <Transaction>2019/11/08 09:40:29.000.797,D:\works\delphi\phone\myphone\Unit1.pas=D:\works\delphi\phone\myphone\uRecvDataControl.pas</Transaction>
+    <Transaction>2019/11/10 08:37:32.000.450,=D:\works\delphi\phone\myphone\uCameraCap.pas</Transaction>
+    <Transaction>2019/11/25 09:18:01.000.881,=D:\works\delphi\phone\myphone\uSetPhone.pas</Transaction>
+  </Transactions>
+</BorlandProject>

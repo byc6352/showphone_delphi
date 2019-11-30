@@ -1,0 +1,35 @@
+unit uConfig;
+
+interface
+uses
+  Vcl.Forms,System.SysUtils,windows;
+const
+  APP_NAME='猎豹远程协助手机系统(电脑版)';
+  APP_VERSION='3.00';
+  WORK_DIR:string='myphone';
+  LOG_NAME:string='myphoneLog.txt';
+  QQ_WRY:string='QQWry.dat';
+
+  REPEATER_IP:ansistring='154.221.19.215';
+  port_order:DWORD=6001;
+  port_data:DWORD=6002;
+var
+  workdir:string;//工作目录
+  logfile,QQWryFile:string;// 数据库子目录,数据库
+  isInit:boolean=false;
+  procedure init();
+implementation
+procedure init();
+var
+    me:String;
+begin
+  isInit:=true;
+  me:=application.ExeName;
+  workdir:=extractfiledir(me)+'\'+WORK_DIR;
+  if(not DirectoryExists(workdir))then ForceDirectories(workdir);
+  logfile:=workdir+'\'+LOG_NAME;
+  QQWryFile:=workdir+'\'+QQ_WRY;
+end;
+begin
+  init();
+end.

@@ -1,0 +1,160 @@
+object fScreen: TfScreen
+  Left = 89
+  Top = 3
+  Caption = #23631#24149#30417#25511
+  ClientHeight = 641
+  ClientWidth = 1175
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel6: TPanel
+    Left = 0
+    Top = 0
+    Width = 1175
+    Height = 27
+    Align = alTop
+    TabOrder = 0
+    object btnRecordScreen: TSpeedButton
+      Left = 189
+      Top = 2
+      Width = 37
+      Height = 22
+      Caption = #24405#23631
+      OnClick = btnRecordScreenClick
+    end
+    object btnInput: TSpeedButton
+      Left = 1031
+      Top = 1
+      Width = 44
+      Height = 23
+      Caption = #36755#20837
+      OnClick = btnInputClick
+    end
+    object btnLight: TSpeedButton
+      Left = 78
+      Top = 2
+      Width = 37
+      Height = 22
+      Caption = ' '#20142#23631
+      OnClick = btnLightClick
+    end
+    object btnLock: TSpeedButton
+      Left = 116
+      Top = 2
+      Width = 37
+      Height = 22
+      Caption = #38145#23631
+      OnClick = btnLockClick
+    end
+    object Label6: TLabel
+      Left = 581
+      Top = 6
+      Width = 208
+      Height = 13
+      AutoSize = False
+      Caption = #36825#37324#36755#20837#35201#21457#36865#21040#25163#26426#19978#30340#25991#23383' '#65306
+    end
+    object btnHome: TSpeedButton
+      Left = 4
+      Top = 2
+      Width = 37
+      Height = 22
+      Caption = #26700#38754
+      OnClick = btnHomeClick
+    end
+    object btnReturn: TSpeedButton
+      Left = 41
+      Top = 2
+      Width = 37
+      Height = 22
+      Caption = #36820#22238
+      OnClick = btnReturnClick
+    end
+    object chkSeriShot: TCheckBox
+      Left = 315
+      Top = 5
+      Width = 84
+      Height = 17
+      Caption = #36830#32493#25130#23631
+      TabOrder = 0
+    end
+    object btnShotSeriesScreen: TButton
+      Left = 227
+      Top = 2
+      Width = 42
+      Height = 22
+      Caption = #23631#25511
+      TabOrder = 1
+      OnClick = btnShotSeriesScreenClick
+    end
+    object btnshot: TButton
+      Left = 269
+      Top = 2
+      Width = 42
+      Height = 22
+      Caption = #25130#23631
+      TabOrder = 2
+      OnClick = btnshotClick
+    end
+    object edtVtKey: TEdit
+      Left = 792
+      Top = 3
+      Width = 235
+      Height = 21
+      ImeName = #26234#33021#38472#26725#36755#20837#24179#21488'  5.5'
+      TabOrder = 3
+      Text = '0000'
+    end
+    object ckSlide: TCheckBox
+      Left = 394
+      Top = 5
+      Width = 57
+      Height = 17
+      Caption = #28369#21160
+      TabOrder = 4
+    end
+    object chkLongClick: TCheckBox
+      Left = 445
+      Top = 5
+      Width = 58
+      Height = 17
+      Caption = #38271#25353
+      TabOrder = 5
+    end
+    object btnUnlock: TButton
+      Left = 154
+      Top = 2
+      Width = 37
+      Height = 22
+      Caption = #35299#38145
+      TabOrder = 6
+      OnClick = btnUnlockClick
+    end
+  end
+  object ScrollBox1: TScrollBox
+    Left = 0
+    Top = 27
+    Width = 1175
+    Height = 614
+    Align = alTop
+    TabOrder = 1
+    object imgScreen: TImage
+      Left = 0
+      Top = 0
+      Width = 713
+      Height = 481
+      AutoSize = True
+      Center = True
+      IncrementalDisplay = True
+      OnMouseDown = imgScreenMouseDown
+      OnMouseMove = imgScreenMouseMove
+      OnMouseUp = imgScreenMouseUp
+    end
+  end
+end

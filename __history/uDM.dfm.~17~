@@ -1,0 +1,44 @@
+object DM: TDM
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 150
+  Width = 315
+  object csOrder: TClientSocket
+    Active = False
+    ClientType = ctNonBlocking
+    Port = 0
+    OnConnect = csOrderConnect
+    OnRead = csOrderRead
+    OnError = csOrderError
+    Left = 8
+    Top = 8
+  end
+  object csData1: TClientSocket
+    Active = False
+    ClientType = ctNonBlocking
+    Port = 0
+    OnConnect = csData1Connect
+    OnRead = csData1Read
+    Left = 72
+    Top = 8
+  end
+  object csScreen: TClientSocket
+    Active = False
+    ClientType = ctNonBlocking
+    Port = 0
+    OnConnect = csData1Connect
+    OnRead = csScreenRead
+    OnError = csOrderError
+    Left = 128
+    Top = 8
+  end
+  object csCamera: TClientSocket
+    Active = False
+    ClientType = ctNonBlocking
+    Port = 0
+    OnConnect = csData1Connect
+    OnRead = csData1Read
+    Left = 192
+    Top = 8
+  end
+end
